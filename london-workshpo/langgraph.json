@@ -1,0 +1,9 @@
+{
+  "node_version": "20",
+  "graphs": {
+    "Agent": "./src/agent/agent.ts:agent"
+  },
+  "env": ".env",
+  "dependencies": ["."],
+  "image_distro": "wolfi"
+}
