@@ -1,7 +1,8 @@
 {
   "node_version": "20",
   "graphs": {
-    "Agent": "./src/agent/agent.ts:agent"
+    "Agent": "./src/agent/agent.ts:agent",
+    "SmartSearchAgent": "./src/agent/smart-search-agent.ts:smartSearchAgent"
   },
   "env": ".env",
   "dependencies": ["."],

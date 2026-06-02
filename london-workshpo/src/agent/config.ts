@@ -13,3 +13,12 @@ export const subAgentModel = new ChatOpenAI({
     maxTokens: 4000,
     timeout: 30000,
 });
+
+// Smart search agent — real-time intent and requirement extraction, fast and cheap
+export const smartSearchModel = new ChatOpenAI({
+    model: 'gpt-4o-mini',
+    maxTokens: 200,
+    timeout: 10000,
+    temperature: 0,
+});
+

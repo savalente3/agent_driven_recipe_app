@@ -21,10 +21,12 @@ Type something like **"Recipe for tonight with chicken and mushrooms"** or **"Me
 
 ## Main Features
 
-### Conversational search bar
-- Free-text input with inline keyword detection — typing **Recipe** or **Meal plan** highlights the keyword and unlocks the relevant mode
-- Upload an image of your fridge/ingredients directly from the search bar
-- Keywords are clickable and swappable without retyping
+### Smart conversational search bar
+- **Real-time keyword detection** — as you type "Recipe" or "Meal plan", the keyword auto-highlights with a ▾ indicator
+- **Click to swap keywords** — click a highlighted keyword to replace it instantly without retyping the whole query
+- **Rich text input** — contenteditable div, not a plain `<input>`, so cursor tracking and inline styling work seamlessly
+- **Direct image upload** — 📎 button to upload ingredient photos without leaving the search bar; vision AI analyzes them immediately
+- **Intent routing** — the search bar alone determines which agent pipeline runs (recipe vs meal plan) based on which keyword you used
 
 ### Recipe finder
 - Detects ingredients from an uploaded image using vision AI
@@ -143,32 +145,43 @@ agent_driven_recipe_app/
 
 - Node.js 18+
 - Angular CLI (`npm install -g @angular/cli`)
-- A LangGraph account or local LangGraph dev server
 
-### Environment variables
+### 1. Get API keys
 
-Create a `.env` file in `london-workshpo/` (a `.env.example` is provided as a template):
+You'll need keys from OpenAI and Tavily:
 
-```env
-OPENAI_API_KEY=your_openai_key
-TAVILY_API_KEY=your_tavily_key
-```
+- **OpenAI API key**: https://platform.openai.com/api-keys
+- **Tavily API key**: https://app.tavily.com
 
-Get your keys:
-- OpenAI: https://platform.openai.com/api-keys
-- Tavily: https://app.tavily.com
-
-### Running the backend
+### 2. Set up the backend
 
 ```bash
 cd london-workshpo
+```
+
+Create a `.env` file (`.env.example` is provided as a template):
+
+```env
+OPENAI_API_KEY=sk-...your-openai-key-here...
+TAVILY_API_KEY=tvly-...your-tavily-key-here...
+LANGSMITH_API_KEY=ls_...optional-for-debugging...
+
+LANGSMITH_ENDPOINT=https://eu.api.smith.langchain.com
+LANGCHAIN_TRACING_V2=true
+```
+
+Install dependencies and start the agent server:
+
+```bash
 npm install
 npx @langchain/langgraph-cli dev
 ```
 
-The agent server runs at `http://localhost:2024`.
+The agent server will start at **`http://localhost:2024`** and wait for requests.
 
-### Running the frontend
+### 3. Set up the frontend
+
+In a **new terminal**, from the project root:
 
 ```bash
 cd london-workshop-fe
@@ -176,15 +189,61 @@ npm install
 ng serve
 ```
 
-Open `http://localhost:4200`.
+Angular will start the dev server at **`http://localhost:4200`**.
+
+### 4. Open the app
+
+Go to **`http://localhost:4200`** in your browser. Both the frontend and backend are now running and communicating.
 
 ---
 
-## How to use
+## How to use the app
 
-1. **Set your location** — type a city in the location field at the top
-2. **Type a query** — use the keyword **Recipe** or **Meal plan** to switch modes
-3. **Add requirements** (meal plan only) — fill in the date range, people, and dietary chips below the search bar, or just include them naturally in your query
-4. **Upload an image** (recipe only) — click the 📎 icon to upload a photo of ingredients
-5. **Hit Run** — the agent pipeline runs and returns the result
-6. **Regenerate** — hit the regenerate button to get a different suggestion with the same inputs
+### Recipe mode
+
+1. **Set location** — type a city in the location field (top)
+2. **Type a query** — mention "Recipe" or include it naturally: *"Recipe for tonight with chicken"*
+3. **Upload ingredients** (optional) — click 📎 to upload a photo of your fridge
+4. **Hit Run** — the agent:
+   - Detects ingredients from the image (if provided)
+   - Fetches current weather
+   - Searches for recipe ideas combining all context
+   - Returns a full recipe with steps
+5. **Regenerate** — click the button to get a different recipe suggestion
+
+### Meal plan mode
+
+1. **Set location** — type a city in the location field
+2. **Type a query** — mention "Meal plan": *"Meal plan for next week, 2 people, vegan"*
+3. **Add requirements** — the requirement bubbles appear below the search bar:
+   - **Date range** — click to type or use the dropdown (defaults to 1 week)
+   - **People** — how many to cook for
+   - **Dietary** — click to pick from: Vegetarian, Vegan, Gluten-free, Dairy-free, Nut-free, Halal
+4. **Hit Run** — the agent:
+   - Fetches weather for the date range
+   - Searches for recipes matching your requirements
+   - Generates a calendar (day/week/month blocks) with one meal per day
+   - Auto-populates the requirement bubbles with what it understood
+5. **Regenerate** — click to get a different meal plan
+
+---
+
+## Troubleshooting
+
+**Agent server won't start**
+- Check that both API keys are set in `.env`
+- Ensure port 2024 is free (check `lsof -i :2024`)
+- Look at the terminal output for error messages
+
+**Frontend won't compile**
+- Try `npm install` again, then `ng serve`
+- Check that you're using Node 18+
+
+**Search results are empty**
+- Tavily needs internet connection
+- Check that `TAVILY_API_KEY` is valid
+- Try a different query or location
+
+**Image upload fails**
+- Ensure the file is a valid image (PNG/JPG)
+- File size should be under 10MB
