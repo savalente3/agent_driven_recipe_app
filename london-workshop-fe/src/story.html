@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Story — AI Recipe & Meal Planner</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    color: #f0f0f0;
+    min-height: 100vh;
+    background-color: #050510;
+    background-image:
+      radial-gradient(ellipse 180% 140% at 115% -10%, #f97316 0%, transparent 60%),
+      radial-gradient(ellipse 130% 110% at  55%  50%, #7c3aed 0%, transparent 65%),
+      radial-gradient(ellipse 120% 100% at 105% 110%, #db2777 0%, transparent 60%),
+      radial-gradient(ellipse 140% 115% at -10% 115%, #2563eb 0%, transparent 62%);
+    background-attachment: fixed;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 80px 32px;
+    gap: 0;
+  }
+
+  .page {
+    width: 100%;
+    max-width: 760px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 48px;
+  }
+
+  .tag {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #a78bfa;
+  }
+
+  .title {
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1.15;
+    color: #fff;
+  }
+
+  .subtitle {
+    font-size: 16px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.6;
+    max-width: 560px;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 20px;
+    padding: 32px 36px;
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .card-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+  }
+
+  .card-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.3;
+  }
+
+  .card-body {
+    font-size: 14px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.75;
+  }
+
+  .card-body p + p {
+    margin-top: 12px;
+  }
+
+  /* ── Accent cards ── */
+  .card.accent-purple {
+    background: rgba(124, 58, 237, 0.12);
+    border-color: rgba(167, 139, 250, 0.25);
+  }
+
+  .card.accent-orange {
+    background: rgba(249, 115, 22, 0.1);
+    border-color: rgba(249, 115, 22, 0.22);
+  }
+
+  .card.accent-pink {
+    background: rgba(219, 39, 119, 0.1);
+    border-color: rgba(219, 39, 119, 0.22);
+  }
+
+  .card.accent-blue {
+    background: rgba(37, 99, 235, 0.1);
+    border-color: rgba(37, 99, 235, 0.22);
+  }
+
+  /* ── Dead end card ── */
+  .card.dead-end {
+    background: rgba(255,255,255,0.03);
+    border-color: rgba(255,255,255,0.07);
+    opacity: 0.75;
+  }
+
+  .dead-end .card-title::before {
+    content: '✕  ';
+    color: rgba(255,255,255,0.25);
+    font-size: 14px;
+  }
+
+  /* ── Insight pill ── */
+  .insight {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(167, 139, 250, 0.15);
+    border: 1px solid rgba(167, 139, 250, 0.3);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #c4b5fd;
+    align-self: flex-start;
+  }
+
+  /* ── Flow diagram ── */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .flow-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    padding-top: 4px;
+  }
+
+  .flow-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #7c3aed;
+    flex-shrink: 0;
+  }
+
+  .flow-connector {
+    width: 1px;
+    height: 28px;
+    background: rgba(124, 58, 237, 0.35);
+  }
+
+  .flow-step-content {
+    padding-bottom: 24px;
+  }
+
+  .flow-step-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .flow-step-desc {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.5;
+  }
+
+  /* ── Two-col ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  /* ── Section divider ── */
+  .divider {
+    height: 1px;
+    background: rgba(255,255,255,0.07);
+    margin: 20px 0;
+  }
+
+  /* ── Quote ── */
+  .quote {
+    border-left: 2px solid #7c3aed;
+    padding: 12px 0 12px 20px;
+    font-size: 15px;
+    font-style: italic;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.6;
+  }
+
+  /* ── Chip row ── */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chip {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 100px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .chip.purple { background: rgba(167,139,250,0.15); border-color: rgba(167,139,250,0.3); color: #c4b5fd; }
+  .chip.orange { background: rgba(249,115,22,0.12); border-color: rgba(249,115,22,0.3); color: #fdba74; }
+
+  /* ── Next ── */
+  .next-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .next-item:last-child { border-bottom: none; }
+
+  .next-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #a78bfa;
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+
+  .next-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 3px;
+  }
+
+  .next-desc {
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <span class="tag">London Workshop · 2025</span>
+    <h1 class="title">Building an AI-Driven<br/>Recipe & Meal Planner</h1>
+    <p class="subtitle">A walkthrough of the ideas, decisions, and dead ends behind an app that uses LLMs not just as a feature — but as the product itself.</p>
+  </div>
+
+
+  <!-- 1. The Concept -->
+  <div class="card accent-purple">
+    <span class="card-label">01 · The Concept</span>
+    <h2 class="card-title">Not a chatbot. Not a search engine.</h2>
+    <div class="card-body">
+      <p>The starting point was a simple question: what if you could open your fridge, describe what you see, and immediately get a recipe that makes sense for tonight — factoring in the weather, the season, and what you actually feel like eating?</p>
+      <p>The app had to feel like talking to someone who knows what they're doing, not filling in a form. That distinction shaped every decision that followed.</p>
+    </div>
+  </div>
+
+
+  <!-- 2. The Interface -->
+  <div class="card">
+    <span class="card-label">02 · The Interface</span>
+    <h2 class="card-title">A search bar that thinks</h2>
+    <div class="card-body">
+      <p>Forms are transactional. A natural-language input is conversational. The decision to use a single free-text field — rather than dropdowns for cuisine, sliders for people, date pickers for range — was about keeping the user in a flow state.</p>
+      <p>The interface detects intent keywords like <strong style="color:#c084fc">Recipe</strong> and <strong style="color:#fb923c">Meal plan</strong> inline, highlighting them as the user types. This gives the feeling that the app is already understanding — before anything is submitted.</p>
+      <p>The location sits above the search bar rather than inside the form because it's ambient context, not part of the query. It's always there, quietly informing everything.</p>
+    </div>
+  </div>
+
+
+  <!-- 3. Two Modes -->
+  <div class="two-col">
+    <div class="card accent-purple">
+      <span class="card-label">Recipe</span>
+      <h2 class="card-title" style="font-size:18px">One dish,<br/>right now</h2>
+      <p class="card-body" style="font-size:13px">Driven by ingredients — ideally from a photo — and the mood of today. The agent acts as a chef who knows the weather and picks what feels right.</p>
+    </div>
+    <div class="card accent-orange">
+      <span class="card-label">Meal Plan</span>
+      <h2 class="card-title" style="font-size:18px">A full week,<br/>thoughtfully</h2>
+      <p class="card-body" style="font-size:13px">Driven by a date range, preferences, and constraints. The agent acts as a nutritionist who balances variety, health, and what the user actually likes.</p>
+    </div>
+  </div>
+
+
+  <!-- 4. The AI Architecture -->
+  <div class="card">
+    <span class="card-label">04 · The AI Architecture</span>
+    <h2 class="card-title">One agent isn't enough</h2>
+    <div class="card-body">
+      <p>The first instinct is to give an LLM the user's query and ask for a recipe. That works — barely. The problem is a single agent trying to do too many things at once: understand intent, search the web, factor in weather, write the recipe, and return structured data. The results are generic and inconsistent.</p>
+      <p>The better approach is a hierarchy. One orchestrator that reads intent and coordinates. Two specialists — a chef and a nutritionist — that do the actual work.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-line"><div class="flow-dot"></div><div class="flow-connector"></div></div>
+        <div class="flow-step-content">
+          <div class="flow-step-title">Orchestrator</div>
+          <div class="flow-step-desc">Reads the query, identifies intent, analyses the image if present, then delegates to the right specialist.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line"><div class="flow-dot"></div><div class="flow-connector"></div></div>
+        <div class="flow-step-content">
+          <div class="flow-step-title">Sub-agent (Chef or Nutritionist)</div>
+          <div class="flow-step-desc">Receives focused context. Searches for weather, searches for recipes, produces a structured response.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line"><div class="flow-dot"></div></div>
+        <div class="flow-step-content">
+          <div class="flow-step-title">Structured Output</div>
+          <div class="flow-step-desc">A typed schema the UI can render directly — no parsing, no guessing.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight">Each agent has one job and does it well.</div>
+  </div>
+
+
+  <!-- 5. Weather as input -->
+  <div class="card accent-orange">
+    <span class="card-label">05 · The Weather Idea</span>
+    <h2 class="card-title">Weather as a creative input, not a utility</h2>
+    <div class="card-body">
+      <p>Weather in most apps is informational — it tells you what to wear. Here it's a creative signal. A grey rainy afternoon calls for something comforting and indulgent. A bright morning calls for something fresh and light.</p>
+      <p>The agent doesn't just note the weather — it lets it set the mood of the dish. This is what makes the output feel less like a database result and more like a recommendation from someone who's paying attention.</p>
+    </div>
+    <div class="quote">
+      "The weather outside should change what ends up on the plate."
+    </div>
+  </div>
+
+
+  <!-- 6. Meal plan structure -->
+  <div class="card">
+    <span class="card-label">06 · Meal Plan Structure</span>
+    <h2 class="card-title">Let the agent decide the structure</h2>
+    <div class="card-body">
+      <p>A meal plan for tomorrow looks different from one for next month. Rather than forcing the user to pick a view (day / week / month), the agent reads the date range and decides the right block structure itself.</p>
+      <p>1–2 days becomes individual day blocks. A week becomes a single week block. A month becomes a monthly calendar. The UI renders whatever the agent returns — the structure is part of the response, not the request.</p>
+    </div>
+    <div class="chips">
+      <span class="chip purple">1–2 days → Day blocks</span>
+      <span class="chip purple">3–14 days → Week blocks</span>
+      <span class="chip purple">15+ days → Month view</span>
+    </div>
+  </div>
+
+
+  <!-- 7. Dead ends -->
+  <div class="card">
+    <span class="card-label">07 · What Didn't Work</span>
+    <h2 class="card-title">The dead ends</h2>
+    <div class="card-body" style="margin-bottom:8px">Every decision came with alternatives that seemed right until they weren't.</div>
+
+    <div class="dead-end card" style="margin-top:8px">
+      <div class="card-title" style="font-size:15px">Page transitions via the browser View Transitions API</div>
+      <div class="card-body" style="font-size:13px">The idea was to animate between states using the native browser API — smooth, hardware-accelerated, no library needed. The problem: Angular updates the DOM asynchronously via signals. By the time the browser captured the "before" snapshot for the transition, Angular had already re-rendered the "after" state. The transition saw no change. Switched to Angular's own animation system which hooks into the rendering cycle directly.</div>
+    </div>
+
+    <div class="dead-end card" style="margin-top:8px">
+      <div class="card-title" style="font-size:15px">Prefetching weather on page load</div>
+      <div class="card-body" style="font-size:13px">To speed up the pipeline, the idea was to fetch the weather as soon as the location is set — before the user even submits. The problem: the date context only exists after the query. "Recipe for tomorrow" needs tomorrow's weather. "Meal plan for next week" needs a week's forecast. You can't fetch the right weather without first reading the intent.</div>
+    </div>
+
+    <div class="dead-end card" style="margin-top:8px">
+      <div class="card-title" style="font-size:15px">Parallel weather + recipe search within the sub-agent</div>
+      <div class="card-body" style="font-size:13px">For the recipe agent, the weather result is needed to craft a good recipe search query — "hearty pasta for a rainy day". Running them in parallel means the search can't be weather-informed. The dependency chain is unavoidable for recipes. For meal planning, it's fine — recipe search there is preference-driven, not weather-driven.</div>
+    </div>
+  </div>
+
+
+  <!-- 8. Pipeline design -->
+  <div class="card accent-blue">
+    <span class="card-label">08 · Pipeline Design</span>
+    <h2 class="card-title">Speed through parallelism — where the dependency allows</h2>
+    <div class="card-body">
+      <p>LLM pipelines are slow by default because each step waits for the previous one. The question is always: which steps actually depend on each other, and which ones are just sequential by habit?</p>
+      <p>For the meal planner, weather and recipe searches are independent — they can run at the same time. More importantly, while the orchestrator analyses an image for ingredients, it can also search for what's in season locally. These results are then merged and handed to the sub-agent as a single, enriched context — which makes just one search call.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-line"><div class="flow-dot" style="background:#3b82f6"></div><div class="flow-connector" style="background:rgba(59,130,246,0.35)"></div></div>
+        <div class="flow-step-content">
+          <div class="flow-step-title">Orchestrator — parallel</div>
+          <div class="flow-step-desc">Reads image for ingredients · searches weather · searches seasonal produce — all at the same time.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line"><div class="flow-dot" style="background:#3b82f6"></div><div class="flow-connector" style="background:rgba(59,130,246,0.35)"></div></div>
+        <div class="flow-step-content">
+          <div class="flow-step-title">Merge</div>
+          <div class="flow-step-desc">Ingredients + weather + what's in season → passed to sub-agent as unified context.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line"><div class="flow-dot" style="background:#3b82f6"></div></div>
+        <div class="flow-step-content">
+          <div class="flow-step-title">Sub-agent — one call</div>
+          <div class="flow-step-desc">One weather-informed, season-aware recipe search. Then generate.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight">Map the dependencies first. Parallelise everything else.</div>
+  </div>
+
+
+  <!-- 9. UI follows the AI -->
+  <div class="card">
+    <span class="card-label">09 · UI Follows the AI</span>
+    <h2 class="card-title">The UI is shaped by how LLMs actually behave</h2>
+    <div class="card-body">
+      <p>Several UI decisions weren't driven by design preference — they were driven by LLM constraints and behaviour.</p>
+      <p>Structured output means the agent returns typed data the UI renders directly. This dictated the component design — every field in the recipe card, every block in the meal plan, maps to something the agent produces.</p>
+      <p>Loading states matter more here than in a typical app. An LLM call with tool use takes 5–15 seconds. The UI has to hold the user's attention and communicate that something real is happening — not just spin a spinner.</p>
+      <p>The tiles on the home screen aren't decorative. They preview the kind of result the user can expect, and they animate into the expanded result when it arrives — creating continuity between the "asking" state and the "answer" state.</p>
+    </div>
+  </div>
+
+
+  <!-- 10. What's next -->
+  <div class="card accent-pink">
+    <span class="card-label">10 · What's Next</span>
+    <h2 class="card-title">Where this goes</h2>
+
+    <div class="next-item">
+      <div class="next-dot"></div>
+      <div>
+        <div class="next-title">Seasonal ingredient tool</div>
+        <div class="next-desc">A new parallel tool at the orchestrator level — what's fresh and in season locally — fed into the recipe search for richer, more grounded results.</div>
+      </div>
+    </div>
+
+    <div class="next-item">
+      <div class="next-dot"></div>
+      <div>
+        <div class="next-title">Meal plan expanded view</div>
+        <div class="next-desc">The full calendar UI with requirement bubbles surfacing what the agent understood from the user's query.</div>
+      </div>
+    </div>
+
+    <div class="next-item">
+      <div class="next-dot"></div>
+      <div>
+        <div class="next-title">Model optimisation</div>
+        <div class="next-desc">A fast vision model for the orchestrator, a stronger creative model for the sub-agents. Speed and quality aren't always in conflict.</div>
+      </div>
+    </div>
+
+    <div class="next-item">
+      <div class="next-dot"></div>
+      <div>
+        <div class="next-title">Taking this further inside the company</div>
+        <div class="next-desc">This app is a prototype for a way of working — agents as product, UI driven by LLM output, pipelines designed around dependencies not assumptions. The same pattern applies far beyond recipes.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:48px"></div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  color: #f0f0f0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-color: #050510;
+  background-image:
+    radial-gradient(ellipse 180% 140% at 115% -10%, #f97316 0%, transparent 60%),
+    radial-gradient(ellipse 130% 110% at  55%  50%, #7c3aed 0%, transparent 65%),
+    radial-gradient(ellipse 120% 100% at 105% 110%, #db2777 0%, transparent 60%),
+    radial-gradient(ellipse 140% 115% at -10% 115%, #2563eb 0%, transparent 62%);
+  background-attachment: fixed;
+}

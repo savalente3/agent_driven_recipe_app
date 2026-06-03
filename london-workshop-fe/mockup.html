@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chef AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; color: #fff; }
+
+    /* ── Background — second phone screen: orange top → magenta → deep indigo bottom ── */
+    .scene {
+      min-height: 100vh; position: relative; overflow: hidden;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 48px 32px; gap: 16px;
+      border-bottom: 2px solid rgba(0,0,0,0.3);
+      background-color: #050510;
+      background-image:
+        radial-gradient(ellipse 180% 140% at 115% -10%, #f97316 0%, transparent 60%),
+        radial-gradient(ellipse 130% 110% at  55%  50%, #7c3aed 0%, transparent 65%),
+        radial-gradient(ellipse 120% 100% at 105% 110%, #db2777 0%, transparent 60%),
+        radial-gradient(ellipse 140% 115% at -10% 115%, #2563eb 0%, transparent 62%);
+    }
+
+    .s1 { justify-content: center; }
+    .s2, .s3 { justify-content: flex-start; padding-top: 36px; }
+
+    .state-label {
+      position: absolute; top: 20px; left: 28px;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+      color: rgba(255,255,255,0.3); z-index: 10;
+    }
+
+    /* ── Search — liquid glass ── */
+    .search-wrap { display: flex; flex-direction: column; gap: 8px; z-index: 2; width: 100%; max-width: 640px; }
+    .search-row  { display: flex; align-items: center; gap: 10px; }
+
+    .search-bar {
+      flex: 1; display: flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 14px; padding: 11px 16px;
+      backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+    .search-icon { font-size: 15px; opacity: 0.55; flex-shrink: 0; }
+    .search-text { font-size: 14px; color: rgba(255,255,255,0.5); flex: 1; }
+    .upload-icon { font-size: 14px; opacity: 0.5; flex-shrink: 0; }
+
+    .keyword {
+      color: #fff; background: rgba(255,255,255,0.18);
+      border-radius: 4px; padding: 1px 5px;
+      box-shadow: 2px 0 0 rgba(255,255,255,0.18), -2px 0 0 rgba(255,255,255,0.18);
+    }
+    .keyword-arrow { font-size: 10px; margin-left: 2px; opacity: 0.7; }
+
+    .run-btn {
+      flex-shrink: 0; padding: 11px 24px;
+      background: #7c3aed;
+      border: none;
+      border-radius: 14px; color: #fff;
+      font-family: inherit; font-size: 13px; font-weight: 600;
+      cursor: pointer; white-space: nowrap;
+    }
+
+    .location-row   { display: flex; align-items: center; gap: 8px; align-self: flex-start; }
+    .location-label { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.35); letter-spacing: 0.08em; text-transform: uppercase; }
+    .location-val   { font-size: 12px; color: #fff; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 3px 10px; }
+
+    /* ── Tiles — solid dark blue, subtle border ── */
+    .tile {
+      border-radius: 18px; position: relative; overflow: hidden;
+    }
+    .tile-recipe   { background: #0d1830; border: 1px solid rgba(0,0,0,0.45); }
+    .tile-mealplan { background: #0d1830; border: 1px solid rgba(0,0,0,0.45); }
+
+    .tile-tag {
+      font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 3px 10px; border-radius: 20px; display: inline-block; width: fit-content;
+    }
+    .tile-recipe .tile-tag   { background: rgba(168,85,247,0.2); color: #c084fc; }
+    .tile-mealplan .tile-tag { background: rgba(249,115,22,0.18); color: #fb923c; }
+
+    .tile h3 { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; color: #fff; }
+    .tile p  { font-size: 12px; color: rgba(255,255,255,0.45); line-height: 1.55; }
+
+    /* ── STATE 1 ── */
+    .s1 .search-wrap { max-width: 640px; }
+    .s1 .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; max-width: 640px; }
+    .s1 .tile  { padding: 24px; display: flex; flex-direction: column; gap: 10px; min-height: 145px; }
+
+    /* ── STATES 2 & 3 ── */
+    .s2 .search-wrap, .s3 .search-wrap { max-width: 640px; }
+    .content-area { width: 100%; max-width: 860px; display: flex; flex-direction: column; gap: 12px; z-index: 2; }
+
+    .corner-row-right { display: flex; justify-content: flex-end; }
+    .corner-row-left  { display: flex; justify-content: flex-start; }
+
+    .tile-mini {
+      width: 168px; padding: 14px 16px;
+      display: flex; flex-direction: column; gap: 6px;
+      cursor: pointer; opacity: 0.6; transition: opacity 0.2s;
+    }
+    .tile-mini:hover { opacity: 1; }
+    .tile-mini h3 { font-size: 13px; }
+    .tile-mini p  { font-size: 11px; }
+    .tile-mini .tile-tag { font-size: 8px; }
+
+    .tile-expanded { width: 100%; padding: 28px; display: flex; flex-direction: column; gap: 16px; }
+
+    /* ── Recipe expanded internals ── */
+    .recipe-top-row  { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .recipe-top-left { display: flex; align-items: center; gap: 10px; }
+
+    .weather-chip {
+      font-size: 11px; font-weight: 500; color: #d8b4fe;
+      background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.3);
+      border-radius: 8px; padding: 4px 10px; white-space: nowrap;
+    }
+    .small-btn {
+      font-size: 11px; font-weight: 600; color: #fff;
+      background: #7c3aed; border: none;
+      border-radius: 8px; padding: 5px 12px; cursor: pointer;
+      font-family: inherit;
+    }
+    .small-btn-orange {
+      font-size: 11px; font-weight: 600; color: #fff;
+      background: #ea580c; border: none;
+      border-radius: 8px; padding: 5px 12px; cursor: pointer;
+      font-family: inherit;
+    }
+
+    .expanded-name { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; color: #fff; }
+    .recipe-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+    .recipe-section h4 {
+      font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+      color: #fbbf24; margin-bottom: 10px;
+    }
+    .recipe-section ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+    .recipe-section ul li { font-size: 13px; color: rgba(255,255,255,0.72); line-height: 1.5; display: flex; gap: 8px; }
+    .recipe-section ul li::before { content: '·'; color: #fb923c; font-size: 16px; line-height: 1.2; flex-shrink: 0; }
+
+    .steps-list { counter-reset: step; }
+    .steps-list li { counter-increment: step; }
+    .steps-list li::before {
+      content: counter(step); color: #c084fc; font-size: 10px; font-weight: 700;
+      background: rgba(168,85,247,0.22); border-radius: 50%;
+      width: 18px; height: 18px; min-width: 18px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 2px;
+    }
+
+    /* ── Meal plan internals ── */
+    .meal-form-panel {
+      background: rgba(0,0,0,0.45);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px; padding: 18px 20px;
+      display: flex; flex-direction: column; gap: 12px;
+      backdrop-filter: blur(2px);
+    }
+    .meal-form-panel-label { font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #fbbf24; }
+    .meal-form-row { display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; }
+
+    .form-field { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 110px; }
+    .form-field label { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.08em; }
+    .form-input-mock {
+      font-size: 13px; color: #fff;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 8px; padding: 7px 12px;
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .form-input-mock.empty { color: rgba(255,255,255,0.25); }
+
+    .meal-results-section { display: flex; flex-direction: column; gap: 12px; }
+    .meal-results-label { font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.4); }
+
+    .meal-day-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .meal-day {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px; padding: 12px;
+      display: flex; flex-direction: column; gap: 4px; cursor: pointer;
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .meal-day-name { font-size: 9px; font-weight: 700; color: #fb923c; text-transform: uppercase; letter-spacing: 0.08em; }
+    .meal-day-dish { font-size: 12px; color: #fff; font-weight: 500; line-height: 1.35; }
+    .meal-day-note { font-size: 10px; color: rgba(255,255,255,0.35); }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     STATE 1 — Initial
+═══════════════════════════════════ -->
+<div class="scene s1">
+  <div class="state-label">1 — Initial</div>
+  <div class="search-wrap">
+    <div class="search-row">
+      <div class="search-bar"><span class="search-icon">🔍</span><span class="search-text">e.g. I want a Recipe for tonight…</span><span class="upload-icon">📎</span></div>
+      <button class="run-btn">Run ↵</button>
+    </div>
+    <div class="location-row"><span class="location-label">📍 Location</span><span class="location-val">Nottingham</span></div>
+  </div>
+  <div class="tiles">
+    <div class="tile tile-recipe"><div class="tile-tag">Recipe Finder</div><h3>Find a Recipe</h3><p>Upload ingredients, get a weather-appropriate recipe for your location.</p></div>
+    <div class="tile tile-mealplan"><div class="tile-tag">Meal Plan</div><h3>Plan Your Week</h3><p>Pick a date range and get a full meal plan with daily recipes.</p></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     STATE 2 — Recipe expanded
+═══════════════════════════════════ -->
+<div class="scene s2">
+  <div class="state-label">2 — Recipe expanded</div>
+  <div class="search-wrap">
+    <div class="search-row">
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <span class="search-text">I want a <span class="keyword">Recipe<span class="keyword-arrow">⌄</span></span> for tonight</span>
+        <span class="upload-icon" style="opacity:1; outline:1.5px solid rgba(168,85,247,0.5); border-radius:5px; background:rgba(168,85,247,0.15); padding:2px 4px;">📎</span>
+      </div>
+      <button class="run-btn">Run ↵</button>
+    </div>
+    <div class="location-row"><span class="location-label">📍 Location</span><span class="location-val">Nottingham</span></div>
+  </div>
+  <div class="content-area">
+    <div class="corner-row-right">
+      <div class="tile tile-mealplan tile-mini">
+        <div class="tile-tag">Meal Plan</div><h3>Plan Your Week</h3><p>Switch module</p>
+      </div>
+    </div>
+    <div class="tile tile-recipe tile-expanded">
+      <div class="recipe-top-row">
+        <div class="recipe-top-left">
+          <div class="tile-tag">Recipe Finder</div>
+          <div class="weather-chip">🌤 14°C · Partly cloudy · Nottingham</div>
+        </div>
+        <button class="small-btn-orange">↺ Regenerate</button>
+      </div>
+      <div class="expanded-name">Chickpea Cucumber Feta Salad</div>
+      <div class="recipe-grid">
+        <div class="recipe-section">
+          <h4>Ingredients</h4>
+          <ul>
+            <li>1 can chickpeas, drained and rinsed</li>
+            <li>1 cucumber, diced</li>
+            <li>100g feta cheese, crumbled</li>
+            <li>1 red onion, thinly sliced</li>
+            <li>Handful of fresh parsley</li>
+            <li>3 tbsp olive oil, 2 tbsp lemon juice</li>
+          </ul>
+        </div>
+        <div class="recipe-section">
+          <h4>Steps</h4>
+          <ul class="steps-list">
+            <li>Drain and rinse the chickpeas, pat dry.</li>
+            <li>Dice cucumber and slice red onion thinly.</li>
+            <li>Combine chickpeas, cucumber and onion in a bowl.</li>
+            <li>Whisk olive oil, lemon juice, salt and pepper.</li>
+            <li>Toss with dressing, top with feta and parsley.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     STATE 3 — Meal Plan expanded
+═══════════════════════════════════ -->
+<div class="scene s3">
+  <div class="state-label">3 — Meal plan expanded</div>
+  <div class="search-wrap">
+    <div class="search-row">
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <span class="search-text">I want a <span class="keyword">Meal plan<span class="keyword-arrow">⌄</span></span> for this week</span>
+        <span class="upload-icon">📎</span>
+      </div>
+      <button class="run-btn">Run ↵</button>
+    </div>
+    <div class="location-row"><span class="location-label">📍 Location</span><span class="location-val">Nottingham</span></div>
+  </div>
+  <div class="content-area">
+    <div class="corner-row-left">
+      <div class="tile tile-recipe tile-mini">
+        <div class="tile-tag">Recipe Finder</div><h3>Find a Recipe</h3><p>Switch module</p>
+      </div>
+    </div>
+    <div class="tile tile-mealplan tile-expanded">
+      <div class="meal-form-panel">
+        <span class="meal-form-panel-label">Refine your plan</span>
+        <div class="meal-form-row">
+          <div class="form-field"><label>Dietary</label><div class="form-input-mock">Vegetarian</div></div>
+          <div class="form-field"><label>Cuisine</label><div class="form-input-mock empty">Any</div></div>
+          <div class="form-field"><label>Allergies</label><div class="form-input-mock empty">None</div></div>
+          <div class="form-field"><label>Days</label><div class="form-input-mock">7</div></div>
+          <button class="small-btn" style="align-self:flex-end; padding:8px 18px; margin-left:auto;">Update ↵</button>
+        </div>
+      </div>
+      <div class="meal-results-section">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+          <div class="meal-results-label">Week of 27 May → 2 Jun</div>
+          <button class="small-btn-orange">↺ Regenerate</button>
+        </div>
+        <div class="meal-day-grid">
+          <div class="meal-day"><div class="meal-day-name">Mon</div><div class="meal-day-dish">Mushroom Risotto</div><div class="meal-day-note">~30 min</div></div>
+          <div class="meal-day"><div class="meal-day-name">Tue</div><div class="meal-day-dish">Lentil Dahl</div><div class="meal-day-note">~25 min</div></div>
+          <div class="meal-day"><div class="meal-day-name">Wed</div><div class="meal-day-dish">Roasted Veggie Pasta</div><div class="meal-day-note">~35 min</div></div>
+          <div class="meal-day"><div class="meal-day-name">Thu</div><div class="meal-day-dish">Halloumi Tacos</div><div class="meal-day-note">~20 min</div></div>
+          <div class="meal-day"><div class="meal-day-name">Fri</div><div class="meal-day-dish">Spinach Omelette</div><div class="meal-day-note">~15 min</div></div>
+          <div class="meal-day"><div class="meal-day-name">Sat</div><div class="meal-day-dish">Chickpea Curry</div><div class="meal-day-note">~40 min</div></div>
+          <div class="meal-day"><div class="meal-day-name">Sun</div><div class="meal-day-dish">Butternut Soup</div><div class="meal-day-note">~30 min</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

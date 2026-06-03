@@ -1,0 +1,164 @@
+<div class="bg"></div>
+
+<div class="layout" [class.submitted]="submitted()" (click)="resetToInitial()">
+
+  <div class="search" (click)="$event.stopPropagation()">
+    <div class="location">
+      <span class="location-label">📍 Location</span>
+      <div class="location-input-wrap">
+        
+        @if (submitted()) {
+          <span class="weather-icon">🌤</span>
+        }
+
+        <input
+          type="text"
+          class="location-field"
+          placeholder="Search a city…"
+          [value]="location()"
+          (input)="location.set($any($event.target).value)"
+        />
+      </div>
+    </div>
+
+    <div class="search-row">
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+
+        <div
+          #searchInput
+          contenteditable="true"
+          class="search-input"
+          data-placeholder="e.g. I want a recipe for tonight…"
+          (input)="onSearchChange($event)"
+          (click)="onInputClick($event)"
+          (paste)="onPaste($event)"
+          (keydown.enter)="$event.preventDefault(); onSubmit()"
+          spellcheck="false"
+        ></div>
+
+        <label class="upload-btn" [class.upload-btn-active]="imageBase64()">
+          <input type="file" accept="image/*" (change)="onImageUpload($event)" hidden />
+          📎
+        </label>
+
+      </div>
+      <button class="submit-btn" (click)="onSubmit()">Run ↵</button>
+    </div>
+
+    @if (activeModule() === 'mealplan') {
+      <div class="req-row" (click)="$event.stopPropagation()">
+        <div class="req-chip" [class.filled]="reqDateRange()">
+          <input placeholder="Date range" [value]="reqDateRange()" (input)="reqDateRange.set($any($event.target).value)" />
+          
+          @if (reqDateRange()) { 
+            <button class="req-clear" (click)="reqDateRange.set('')">×</button>
+          }
+        </div>
+
+        <div class="req-chip" [class.filled]="reqPeople()">
+          <input placeholder="People" [value]="reqPeople()" (input)="reqPeople.set($any($event.target).value)" />
+          
+          @if (reqPeople()) { 
+            <button class="req-clear" (click)="reqPeople.set('')">×</button> 
+          }
+        </div>
+
+        <div class="req-chip" #dietaryChip [class.filled]="reqDietary()" (mousedown)="openDietaryDropdown(dietaryChip)">
+          <input placeholder="Dietary" [value]="reqDietary()" (input)="reqDietary.set($any($event.target).value)" />
+          
+          @if (reqDietary()) { 
+            <button class="req-clear" (click)="$event.stopPropagation(); reqDietary.set(''); showDietaryMenu.set(false)">×</button> 
+          }
+        </div>
+
+      </div>
+    }
+  </div>
+
+  <!-- STATE 1 — tile grid -->
+  @if (activeView() === 'initial') {
+    <div @slideInUp class="tiles" (click)="$event.stopPropagation()">
+      <app-recipe 
+        mode="tile" 
+        [data]="recipeData()"
+         (activate)="activeView.set('recipe')" 
+      />
+
+      <app-meal-plan 
+        mode="tile" 
+        (activate)="activeView.set('mealplan')" 
+      />
+    </div>
+  }
+
+  <!-- STATE 2 — recipe expanded -->
+  @if (submitted() && activeView() === 'recipe') {
+    <div @fadeScale class="content-area" (click)="$event.stopPropagation()">
+      <div class="corner-row-right">
+        <app-meal-plan 
+          mode="mini" 
+          (activate)="activeView.set('mealplan')"
+        />
+      </div>
+
+      <app-recipe 
+        mode="expanded" 
+        [data]="recipeData()" 
+        [location]="location()" 
+        [loading]="isLoading()" 
+        (regenerate)="onSubmit()" 
+      />
+    </div>
+  }
+
+  <!-- STATE 3 — meal plan expanded -->
+  @if (submitted() && activeView() === 'mealplan') {
+    <div @fadeScale class="content-area" (click)="$event.stopPropagation()">
+      <div class="corner-row-left">
+        <app-recipe 
+          mode="mini" 
+          [data]="recipeData()" 
+          (activate)="activeView.set('recipe')" 
+        />
+      </div>
+
+      <app-meal-plan 
+        mode="expanded" 
+        [data]="mealPlanData()" 
+        [loading]="isLoading()" 
+        (regenerate)="onSubmit()" 
+      />
+    </div>
+  }
+
+</div>
+
+@if (showDietaryMenu()) {
+  <div class="keyword-dropdown"
+    [style.left.px]="dietaryDropdownX()"
+    [style.top.px]="dietaryDropdownY()"
+    (click)="$event.stopPropagation()">
+    
+    @for (opt of dietaryOptions; track opt) {
+      <div class="keyword-dropdown-item" (click)="selectDietary(opt)">
+        <span class="keyword-dot" style="background: rgba(167,139,250,0.5)"></span>
+        {{ opt }}
+      </div>
+    }
+  </div>
+}
+
+@if (showDropdown()) {
+  <div class="keyword-dropdown"
+       [style.left.px]="dropdownX()"
+       [style.top.px]="dropdownY()"
+       (click)="$event.stopPropagation()">
+    @for (option of dropdownOptions(); track option) {
+      <div class="keyword-dropdown-item" (click)="selectOption(option)">
+        <span class="keyword-dot" [style.background]="keywordColors[option]"></span>
+        {{ option }}
+      </div>
+    }
+  </div>
+}

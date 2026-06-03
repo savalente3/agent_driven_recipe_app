@@ -1,0 +1,78 @@
+<!-- TILE -->
+@if (mode === 'tile') {
+  <div class="mealplan-card tile" (click)="activate.emit()">
+    <div class="tag">Meal Plan</div>
+    <h3>Plan Your Week</h3>
+    <p>Pick a date range and get a full meal plan with daily recipes.</p>
+  </div>
+}
+
+<!-- MINI -->
+@if (mode === 'mini') {
+  <div class="mealplan-card mini" (click)="activate.emit()">
+    <div class="tag">Meal Plan</div>
+    <h3>Plan Your Week</h3>
+    <p>Switch module</p>
+  </div>
+}
+
+<!-- EXPANDED -->
+@if (mode === 'expanded') {
+  <div class="mealplan-card expanded">
+
+    <div class="expanded-header">
+      <div class="tag">Meal Plan</div>
+      <button class="regen-btn" (click)="regenerate.emit()">↺ Regenerate</button>
+    </div>
+
+    @if (loading) {
+      <div class="params-row">
+        @for (i of [1,2,3]; track i) {
+          <div class="skel skel-bubble"></div>
+        }
+      </div>
+
+      <div class="block">
+        <div class="skel skel-block-label"></div>
+        <div class="days-row">
+          
+        @for (i of [1,2,3,4,5,6,7]; track i) {
+          <div class="day-card">
+            <div class="skel skel-date"></div>
+            <div class="skel skel-meal"></div>
+          </div>
+        }
+
+        </div>
+      </div>
+
+    } @else if (blocks.length > 0) {
+
+      @if (parameterBubbles.length > 0) {
+        <div class="params-row">
+          @for (bubble of parameterBubbles; track bubble) {
+            <span class="param-chip">{{ bubble }}</span>
+          }
+        </div>
+      }
+
+      @for (block of blocks; track block.label) {
+        <div class="block">
+          <div class="block-label">{{ block.label }}</div>
+          <div class="days-row">
+            @for (day of block.days; track day.date) {
+              <div class="day-card">
+                <div class="day-date">{{ day.date }}</div>
+                <div class="day-meal">{{ day.meal }}</div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+    } @else {
+      <div class="empty-state">Run a meal plan query to get started</div>
+    }
+
+  </div>
+}

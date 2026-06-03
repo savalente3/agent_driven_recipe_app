@@ -1,0 +1,182 @@
+.mealplan-card {
+  background: #0d1830;
+  border: 1px solid rgba(0, 0, 0, 0.45);
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  cursor: pointer;
+
+  &.tile {
+    padding: 24px;
+    min-height: 145px;
+  }
+
+  &.mini {
+    padding: 14px 16px;
+    width: 168px;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    h3 { font-size: 13px; }
+    p  { font-size: 11px; }
+    .tag { font-size: 8px; }
+    &:hover { opacity: 1; }
+  }
+
+  &.expanded {
+    padding: 28px;
+    cursor: default;
+    gap: 20px;
+    width: 100%;
+  }
+}
+
+.tag {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 20px;
+  display: inline-block;
+  width: fit-content;
+  background: rgba(249, 115, 22, 0.18);
+  color: #fb923c;
+}
+
+h3 {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #fff;
+  margin: 0;
+}
+
+p {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.empty-state {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 13px;
+  padding: 24px 0;
+  text-align: center;
+}
+
+.expanded-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.regen-btn {
+  background: rgba(249, 115, 22, 0.12);
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  border-radius: 10px;
+  padding: 6px 14px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fb923c;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover { background: rgba(249, 115, 22, 0.22); }
+}
+
+/* ── Parameter bubbles ── */
+.params-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.param-chip {
+  background: rgba(249, 115, 22, 0.1);
+  border: 1px solid rgba(249, 115, 22, 0.25);
+  border-radius: 100px;
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #fb923c;
+}
+
+/* ── Blocks ── */
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.block-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(249, 115, 22, 0.7);
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(249, 115, 22, 0.15);
+}
+
+/* ── Days row ── */
+.days-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+}
+
+/* ── Day card ── */
+.day-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition: background 0.15s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.07);
+  }
+}
+
+.day-date {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fb923c;
+}
+
+.day-meal {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.4;
+}
+
+/* ── Loading skeleton ── */
+.skel {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.06) 0%,
+    rgba(255,255,255,0.12) 50%,
+    rgba(255,255,255,0.06) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite;
+  border-radius: 6px;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skel-bubble  { height: 24px; width: 80px; border-radius: 100px; }
+.skel-block-label { height: 10px; width: 140px; margin-bottom: 4px; }
+.skel-date    { height: 8px;  width: 60%; }
+.skel-meal    { height: 36px; border-radius: 8px; }

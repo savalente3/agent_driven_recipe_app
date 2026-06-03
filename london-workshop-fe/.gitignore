@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Angular cache and build output
+.angular/
+dist/
+
+# Environment files
+.env
+.env.local
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/

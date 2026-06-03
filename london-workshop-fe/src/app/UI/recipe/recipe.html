@@ -1,0 +1,78 @@
+<!-- TILE -->
+@if (mode === 'tile') {
+  <div class="recipe-card tile" (click)="activate.emit()">
+    <div class="tag">Recipe Finder</div>
+    <h3>{{ data?.recipeName ?? 'Find a Recipe' }}</h3>
+    <p>Upload ingredients, get a weather-appropriate recipe for your location.</p>
+  </div>
+}
+
+<!-- MINI -->
+@if (mode === 'mini') {
+  <div class="recipe-card mini" (click)="activate.emit()">
+    <div class="tag">Recipe Finder</div>
+    <h3>{{ data?.recipeName ?? 'Find a Recipe' }}</h3>
+    <p>Switch module</p>
+  </div>
+}
+
+<!-- EXPANDED -->
+@if (mode === 'expanded') {
+  <div class="recipe-card expanded">
+    <div class="expanded-header">
+      <div class="header-left">
+        <div class="tag">Recipe Finder</div>
+      </div>
+
+      <button class="regen-btn" (click)="regenerate.emit()">↺ Regenerate</button>
+    </div>
+
+    @if (loading) {
+      <div class="loading-skeleton">
+        <div class="skel skel-title"></div>
+        <div class="recipe-grid">
+          <div class="recipe-section">
+            <h4>Ingredients</h4>
+            <div class="skel-list">
+              @for (i of [1,2,3,4,5]; track i) {
+                <div class="skel skel-line" [style.width]="(55 + i * 7) + '%'"></div>
+              }
+            </div>
+          </div>
+
+          <div class="recipe-section">
+            <h4>Steps</h4>
+            <div class="skel-list">
+              @for (i of [1,2,3]; track i) {
+                <div class="skel skel-block"></div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    } @else if (data) {
+      <div class="recipe-name">{{ data.recipeName }}</div>
+      <div class="recipe-grid">
+        <div class="recipe-section">
+          <h4>Ingredients</h4>
+          <ul>
+            @for (item of data.ingredients; track item) {
+              <li>{{ item }}</li>
+            }
+          </ul>
+        </div>
+        
+        <div class="recipe-section">
+          <h4>Steps</h4>
+          <ol class="steps-list">
+            @for (step of data.steps; track step) {
+              <li>{{ step }}</li>
+            }
+          </ol>
+        </div>
+      </div>
+    } @else {
+      <div class="empty-state">Run a query to get a recipe</div>
+    }
+  </div>
+}

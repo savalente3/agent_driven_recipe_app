@@ -1,0 +1,216 @@
+.recipe-card {
+  background: #0d1830;
+  border: 1px solid rgba(0, 0, 0, 0.45);
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  cursor: pointer;
+
+  &.tile {
+    padding: 24px;
+    min-height: 145px;
+  }
+
+  &.mini {
+    padding: 14px 16px;
+    width: 168px;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    h3 { font-size: 13px; }
+    p  { font-size: 11px; }
+    .tag { font-size: 8px; }
+    &:hover { opacity: 1; }
+  }
+
+  &.expanded {
+    padding: 28px;
+    cursor: default;
+    gap: 16px;
+    width: 100%;
+  }
+}
+
+.tag {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 20px;
+  display: inline-block;
+  width: fit-content;
+  background: rgba(168, 85, 247, 0.2);
+  color: #c084fc;
+}
+
+h3 {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #fff;
+  margin: 0;
+}
+
+p {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* Expanded internals */
+.expanded-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.weather-chip {
+  font-size: 11px;
+  font-weight: 500;
+  color: #d8b4fe;
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 8px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+.regen-btn {
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  background: #ea580c;
+  border: none;
+  border-radius: 8px;
+  padding: 5px 12px;
+  cursor: pointer;
+  font-family: inherit;
+  &:hover { opacity: 0.88; }
+}
+
+.recipe-name {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.recipe-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.recipe-section {
+  h4 {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #fbbf24;
+    margin-bottom: 10px;
+  }
+
+  ul, ol { list-style: none; display: flex; flex-direction: column; gap: 7px; padding: 0; margin: 0; }
+
+  li {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.72);
+    line-height: 1.5;
+    display: flex;
+    gap: 8px;
+  }
+}
+
+ul li::before {
+  content: '·';
+  color: #fb923c;
+  font-size: 16px;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
+.steps-list {
+  counter-reset: step;
+  li {
+    counter-increment: step;
+    &::before {
+      content: counter(step);
+      color: #c084fc;
+      font-size: 10px;
+      font-weight: 700;
+      background: rgba(168, 85, 247, 0.22);
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      min-width: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+  }
+}
+
+.empty-state {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 13px;
+  padding: 24px 0;
+  text-align: center;
+}
+
+/* Loading skeleton */
+.loading-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.skel {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.06) 0%,
+    rgba(255,255,255,0.12) 50%,
+    rgba(255,255,255,0.06) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite;
+  border-radius: 6px;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skel-title {
+  height: 26px;
+  width: 55%;
+  border-radius: 8px;
+}
+
+.skel-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.skel-line {
+  height: 13px;
+}
+
+.skel-block {
+  height: 36px;
+  width: 100%;
+  border-radius: 8px;
+}
