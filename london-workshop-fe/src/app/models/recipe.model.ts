@@ -15,9 +15,7 @@ export interface RecipeAgentResponse {
 
 export interface MealPlanDay {
   date: string;
-  breakfast: string;
-  lunch: string;
-  dinner: string;
+  meal: string;
 }
 
 export interface MealPlanBlock {
