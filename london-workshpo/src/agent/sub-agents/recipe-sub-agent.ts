@@ -16,7 +16,7 @@ Steps:
 2. Pick the most exciting, fitting recipe from the results — trust your instincts.
 3. Write out the full recipe: name, ingredients with quantities, and step-by-step cooking instructions.`;
 
-const recipeSchema = z.object({
+export const recipeSchema = z.object({
   recipeName: z.string().describe("name of the recipe"),
   ingredients: z.array(z.string()).describe("ingredients with quantities, e.g. '1 avocado, diced'"),
   steps: z.array(z.string()).describe("ordered cooking steps written out in full"),

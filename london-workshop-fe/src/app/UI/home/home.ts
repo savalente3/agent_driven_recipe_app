@@ -159,23 +159,45 @@ export class Home {
     this.smartSearchTimeout = setTimeout(() => this.runSmartSearch(text), 400);
   }
 
+  private stripLeadingKeyword(text: string): string {
+    for (const kw of KEYWORDS) {
+      const re = new RegExp(`^${kw}\\s+`, 'i');
+      if (re.test(text)) return text.replace(re, '');
+    }
+    return text;
+  }
+
   private async runSmartSearch(text: string) {
     if (text.trim().length < 10) return;
 
-    const result = await this.agentService.smartSearch(text);
+    // Strip any auto-injected keyword prefix before asking the agent —
+    // otherwise it just sees its own previous suggestion echoed back and
+    // never changes its mind.
+    const core = this.stripLeadingKeyword(text);
+
+    const result = await this.agentService.smartSearch(core);
     if (!result) return;
 
     // Use current text from signal (user may have typed more while waiting)
     const currentText = this.searchText();
+    const currentCore = this.stripLeadingKeyword(currentText);
 
-    // Inject keyword at the beginning if intent detected and no keyword already present
     if (result.intent) {
-      const hasKeyword = KEYWORDS.some(kw => currentText.toLowerCase().includes(kw.toLowerCase()));
+      const keyword = result.intent === 'recipe' ? 'Recipe' : 'Meal plan';
 
-      if (!hasKeyword) {
-        const keyword = result.intent === 'recipe' ? 'Recipe' : 'Meal plan';
-        const updated = `${keyword} ${currentText}`;
+      // If the user's own sentence already contains a keyword phrase,
+      // that occurrence becomes the highlighted/clickable keyword — drop
+      // the auto-injected prefix instead of duplicating it.
+      const hasEmbeddedKeyword = KEYWORDS.some(kw => currentCore.toLowerCase().includes(kw.toLowerCase()));
 
+      let updated = hasEmbeddedKeyword ? currentCore : `${keyword} ${currentCore}`;
+
+      // Normalise keyword casing so the highlighted mark and the stored text agree
+      KEYWORDS.forEach(kw => {
+        updated = updated.replace(new RegExp(`(${kw})`, 'gi'), kw);
+      });
+
+      if (updated.toLowerCase() !== currentText.toLowerCase()) {
         this.searchText.set(updated);
 
         // Use setTimeout to ensure DOM update happens in Angular's next tick

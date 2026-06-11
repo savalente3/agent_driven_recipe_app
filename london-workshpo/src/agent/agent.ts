@@ -1,14 +1,14 @@
 import { createAgent } from "langchain";
 import * as z from "zod";
 import { orchestratorModel } from "./config.js";
-import { recipeSubAgentTool } from "./sub-agents/recipe-sub-agent.js";
-import { mealPlanSubAgentTool } from "./sub-agents/meal-plan-sub-agent.js";
+import { recipeSubAgentTool, recipeSchema } from "./sub-agents/recipe-sub-agent.js";
+import { mealPlanSubAgentTool, mealPlanSchema } from "./sub-agents/meal-plan-sub-agent.js";
 import { searchWeather } from "./tools/search-weather.js";
 import { searchSeasonalProducts } from "./tools/search-seasonal-products.js";
 
 const orchestratorSchema = z.object({
   module: z.enum(['recipe', 'meal-plan']),
-  data: z.record(z.unknown()).describe("The exact object returned by the sub-agent tool call. Place it here as-is — do not stringify it.")
+  data: z.union([recipeSchema, mealPlanSchema]).describe("The exact object returned by the sub-agent tool call. Place it here as-is — do not stringify it.")
 });
 
 const systemPrompt = `You are an orchestration agent. The user gives you a search query, a location, and optionally an image.

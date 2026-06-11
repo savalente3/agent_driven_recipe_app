@@ -87,6 +87,27 @@ p {
   &:hover { background: rgba(249, 115, 22, 0.22); }
 }
 
+.minimize-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+  }
+}
+
 /* ── Parameter bubbles ── */
 .params-row {
   display: flex;
@@ -102,6 +123,51 @@ p {
   font-size: 11px;
   font-weight: 500;
   color: #fb923c;
+
+  &.clickable {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+
+    &::after {
+      content: '▾';
+      font-size: 8px;
+    }
+
+    &:hover {
+      background: rgba(249, 115, 22, 0.2);
+      border-color: rgba(249, 115, 22, 0.4);
+    }
+  }
+}
+
+/* ── Seasonal produce dropdown ── */
+.produce-dropdown {
+  position: fixed;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  background: rgba(13, 24, 48, 0.95);
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  border-radius: 12px;
+  padding: 10px;
+  max-width: 260px;
+  z-index: 30;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.produce-dropdown-item {
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #fdba74;
+  background: rgba(249, 115, 22, 0.12);
+  white-space: nowrap;
 }
 
 /* ── Blocks ── */
@@ -138,10 +204,17 @@ p {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.07);
   transition: background 0.15s;
+  cursor: pointer;
 
   &:hover {
     background: rgba(255, 255, 255, 0.07);
   }
+}
+
+.day-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .day-date {
@@ -152,10 +225,86 @@ p {
   color: #fb923c;
 }
 
-.day-meal {
+.day-toggle {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.day-title {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.8);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
   line-height: 1.4;
+}
+
+/* ── Recipe name (full day view) ── */
+.recipe-name {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+/* ── Day detail (expanded recipe) ── */
+.day-detail {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.day-section {
+  h4 {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #fbbf24;
+    margin: 0 0 8px 0;
+  }
+
+  ul, ol { list-style: none; display: flex; flex-direction: column; gap: 6px; padding: 0; margin: 0; }
+
+  li {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.72);
+    line-height: 1.5;
+    display: flex;
+    gap: 8px;
+  }
+
+  ul li::before {
+    content: '·';
+    color: #fb923c;
+    font-size: 16px;
+    line-height: 1.2;
+    flex-shrink: 0;
+  }
+}
+
+.steps-list {
+  counter-reset: step;
+  li {
+    counter-increment: step;
+    &::before {
+      content: counter(step);
+      color: #c084fc;
+      font-size: 9px;
+      font-weight: 700;
+      background: rgba(168, 85, 247, 0.22);
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      min-width: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+  }
 }
 
 /* ── Loading skeleton ── */

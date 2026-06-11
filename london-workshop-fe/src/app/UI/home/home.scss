@@ -28,7 +28,7 @@
   flex-direction: column;
   gap: 12px;
   width: 100%;
-  max-width: 640px;
+  max-width: 760px;
   z-index: 2;
 }
 
@@ -38,7 +38,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 14px;
   width: 100%;
-  max-width: 640px;
+  max-width: 760px;
 }
 
 /* Expanded state layout */
@@ -47,7 +47,7 @@
   flex-direction: column;
   gap: 12px;
   width: 100%;
-  max-width: 860px;
+  max-width: 1080px;
   z-index: 2;
 }
 
@@ -216,6 +216,11 @@
   outline: 1.5px solid transparent;
   background: transparent;
 
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+
   &:hover { opacity: 0.8; }
   &.upload-btn-active {
     opacity: 1;
@@ -256,7 +261,20 @@
     color: #f0f0f0;
     width: 72px;
     &::placeholder { color: rgba(255, 255, 255, 0.35); }
+
+    &.people-input {
+      width: 22px;
+      text-align: right;
+    }
   }
+}
+
+.req-suffix {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-left: 4px;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 .dietary-menu {

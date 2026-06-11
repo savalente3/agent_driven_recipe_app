@@ -8,8 +8,8 @@ export const orchestratorModel = new ChatOpenAI({
 
 export const subAgentModel = new ChatOpenAI({
     model: 'gpt-4.1',
-    maxTokens: 4000,
-    timeout: 30000,
+    maxTokens: 8000,
+    timeout: 60000,
 });
 
 export const smartSearchModel = new ChatOpenAI({

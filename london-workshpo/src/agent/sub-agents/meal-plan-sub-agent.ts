@@ -15,12 +15,15 @@ Follow these steps:
    - 3–14 days → week blocks
    - 15+ days or a calendar month → month block
 3. Assign one exciting, varied meal per day across all blocks — no repeated dishes, no boring defaults.
-4. Respect all dietary requirements strictly — they are non-negotiable.
-5. Return the parameters (people, dateRange, allergies, cuisine, other) alongside the blocks so the UI can display what was understood.`;
+4. For each day, write a full recipe: a short title, a complete ingredients list with quantities, and step-by-step cooking instructions — the same level of detail as a standalone recipe.
+5. Respect all dietary requirements strictly — they are non-negotiable.
+6. Return the parameters (people, dateRange, allergies, cuisine, other) alongside the blocks so the UI can display what was understood.`;
 
 const mealPlanDaySchema = z.object({
   date: z.string().describe("full date label, e.g. 'Monday 2 June'"),
-  meal: z.string().describe("suggested meal for the day"),
+  recipeName: z.string().describe("short title of the meal, e.g. 'Grilled Summer Squash Salad'"),
+  ingredients: z.array(z.string()).describe("ingredients with quantities, e.g. '1 avocado, diced'"),
+  steps: z.array(z.string()).describe("ordered cooking steps written out in full"),
 });
 
 const mealPlanBlockSchema = z.object({
@@ -37,7 +40,7 @@ const mealPlanParametersSchema = z.object({
   other: z.array(z.string()),
 });
 
-const mealPlanSchema = z.object({
+export const mealPlanSchema = z.object({
   parameters: mealPlanParametersSchema,
   blocks: z.array(mealPlanBlockSchema),
 });
