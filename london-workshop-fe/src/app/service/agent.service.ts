@@ -43,9 +43,6 @@ export class AIagentService {
             const raw = typeof last?.content === 'string' ? last.content : null;
             if (raw) try { sr = JSON.parse(raw); } catch {}
         }
-        if (sr && typeof sr.data === 'string') {
-            try { sr.data = JSON.parse(sr.data); } catch {}
-        }
         this.result.set(sr ?? null);
     }
 
