@@ -59,7 +59,7 @@
         </div>
 
         <div class="req-chip" [class.filled]="reqPeople()">
-          <input class="people-input" placeholder="People" [value]="reqPeople()" (input)="reqPeople.set($any($event.target).value)" />
+          <input [class.people-input]="reqPeople()" placeholder="People" [value]="reqPeople()" (input)="reqPeople.set($any($event.target).value)" />
 
           @if (reqPeople()) {
             <span class="req-suffix">people</span>
@@ -105,12 +105,13 @@
         />
       </div>
 
-      <app-recipe 
-        mode="expanded" 
-        [data]="recipeData()" 
-        [location]="location()" 
-        [loading]="isLoading()" 
-        (regenerate)="onSubmit()" 
+      <app-recipe
+        mode="expanded"
+        [data]="recipeData()"
+        [location]="location()"
+        [loading]="isLoading()"
+        [loadingStatus]="loadingStatus()"
+        (regenerate)="onSubmit()"
       />
     </div>
   }
@@ -126,11 +127,14 @@
         />
       </div>
 
-      <app-meal-plan 
-        mode="expanded" 
-        [data]="mealPlanData()" 
-        [loading]="isLoading()" 
-        (regenerate)="onSubmit()" 
+      <app-meal-plan
+        mode="expanded"
+        [data]="mealPlanData()"
+        [loading]="isLoading()"
+        [loadingStatus]="loadingStatus()"
+        [regeneratingDate]="regeneratingDayDate()"
+        (regenerate)="onSubmit()"
+        (regenerateDay)="onRegenerateDay($event)"
       />
     </div>
   }

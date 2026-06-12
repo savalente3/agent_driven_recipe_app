@@ -85,6 +85,19 @@ p {
   transition: background 0.15s;
 
   &:hover { background: rgba(249, 115, 22, 0.22); }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+    &:hover { background: rgba(249, 115, 22, 0.12); }
+  }
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
 }
 
 .minimize-btn {
@@ -124,6 +137,24 @@ p {
   font-weight: 500;
   color: #fb923c;
 
+  &.chip-people {
+    background: rgba(96, 165, 250, 0.1);
+    border-color: rgba(96, 165, 250, 0.25);
+    color: #60a5fa;
+  }
+
+  &.chip-dietary {
+    background: rgba(192, 132, 252, 0.1);
+    border-color: rgba(192, 132, 252, 0.25);
+    color: #c084fc;
+  }
+
+  &.chip-cuisine {
+    background: rgba(244, 114, 182, 0.1);
+    border-color: rgba(244, 114, 182, 0.25);
+    color: #f472b6;
+  }
+
   &.clickable {
     display: inline-flex;
     align-items: center;
@@ -141,33 +172,66 @@ p {
       border-color: rgba(249, 115, 22, 0.4);
     }
   }
+
+  &.chip-produce {
+    background: rgba(74, 222, 128, 0.1);
+    border-color: rgba(74, 222, 128, 0.25);
+    color: #4ade80;
+
+    &:hover {
+      background: rgba(74, 222, 128, 0.2);
+      border-color: rgba(74, 222, 128, 0.4);
+    }
+  }
 }
 
 /* ── Seasonal produce dropdown ── */
 .produce-dropdown {
   position: fixed;
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  background: rgba(13, 24, 48, 0.95);
-  border: 1px solid rgba(249, 115, 22, 0.3);
+  flex-direction: column;
+  gap: 2px;
+  background: rgba(74, 222, 128, 0.1);
+  border: 1px solid rgba(74, 222, 128, 0.3);
   border-radius: 12px;
-  padding: 10px;
-  max-width: 260px;
+  padding: 5px;
+  min-width: 160px;
   z-index: 30;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  animation: dropdown-in 0.15s ease;
+}
+
+@keyframes dropdown-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .produce-dropdown-item {
-  padding: 4px 10px;
-  border-radius: 100px;
-  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
   font-weight: 500;
-  color: #fdba74;
-  background: rgba(249, 115, 22, 0.12);
-  white-space: nowrap;
+  color: #4ade80;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover {
+    background: rgba(74, 222, 128, 0.2);
+    color: #fff;
+  }
+}
+
+.produce-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4ade80;
+  flex-shrink: 0;
 }
 
 /* ── Blocks ── */
@@ -190,7 +254,7 @@ p {
 /* ── Days row ── */
 .days-row {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  grid-template-columns: repeat(7, 1fr);
   gap: 10px;
 }
 
@@ -198,23 +262,56 @@ p {
 .day-card {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   gap: 6px;
   padding: 12px;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.07);
-  transition: background 0.15s;
+  border-left: 3px solid rgba(251, 146, 60, 0.55);
+  transition: background 0.15s, border-left-color 0.15s;
   cursor: pointer;
+  aspect-ratio: 1;
 
   &:hover {
     background: rgba(255, 255, 255, 0.07);
   }
-}
 
-.day-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  &.weekend {
+    background: rgba(168, 85, 247, 0.07);
+    border-color: rgba(168, 85, 247, 0.18);
+    border-left-color: rgba(192, 132, 252, 0.7);
+
+    &:hover {
+      background: rgba(168, 85, 247, 0.12);
+    }
+
+    .day-date {
+      color: #c084fc;
+    }
+  }
+
+  &.placeholder {
+    cursor: default;
+    opacity: 0.4;
+    background: rgba(255, 255, 255, 0.015);
+    border-style: dashed;
+    border-left-color: rgba(255, 255, 255, 0.15);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.015);
+    }
+
+    .day-date {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .day-title {
+      color: rgba(255, 255, 255, 0.25);
+      font-size: 18px;
+      font-weight: 400;
+    }
+  }
 }
 
 .day-date {
@@ -225,16 +322,23 @@ p {
   color: #fb923c;
 }
 
-.day-toggle {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.35);
-}
-
 .day-title {
   font-size: 12px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.9);
   line-height: 1.4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+/* ── Hero image (full day view) ── */
+.day-hero-img {
+  width: 100%;
+  max-height: 240px;
+  object-fit: cover;
+  border-radius: 14px;
 }
 
 /* ── Recipe name (full day view) ── */
@@ -308,6 +412,30 @@ p {
 }
 
 /* ── Loading skeleton ── */
+.loading-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #d8b4fe;
+
+  &::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #c084fc;
+    animation: pulse-dot 1.4s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.3; transform: scale(0.85); }
+  50%      { opacity: 1; transform: scale(1.1); }
+}
+
 .skel {
   background: linear-gradient(
     90deg,
@@ -329,3 +457,12 @@ p {
 .skel-block-label { height: 10px; width: 140px; margin-bottom: 4px; }
 .skel-date    { height: 8px;  width: 60%; }
 .skel-meal    { height: 36px; border-radius: 8px; }
+.skel-title   { height: 26px; width: 55%; border-radius: 8px; }
+
+.skel-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.skel-line { height: 13px; }

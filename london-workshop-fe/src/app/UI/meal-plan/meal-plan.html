@@ -24,31 +24,64 @@
 
       <!-- FULL DAY VIEW -->
       <div class="expanded-header">
-        <button class="minimize-btn" (click)="$event.stopPropagation(); collapseDay()" title="Back to week view">⇱</button>
-        <div class="tag">{{ day.date }}</div>
+        <div class="header-left">
+          <button class="minimize-btn" (click)="$event.stopPropagation(); collapseDay()" title="Back to week view">⇲</button>
+          <div class="tag">{{ day.date }}</div>
+        </div>
+        <button class="regen-btn" [disabled]="regeneratingDate === day.date" (click)="$event.stopPropagation(); regenerateDay.emit(day)">
+          {{ regeneratingDate === day.date ? 'Regenerating…' : '↺ Regenerate' }}
+        </button>
       </div>
 
-      <div class="recipe-name">{{ day.recipeName }}</div>
+      @if (regeneratingDate === day.date) {
+        <div class="loading-status">Cooking up something new...</div>
+        <div class="skel skel-title"></div>
+        <div class="day-detail">
+          <div class="day-section">
+            <div class="skel skel-block-label"></div>
+            <div class="skel-list">
+              @for (i of [1,2,3,4]; track i) {
+                <div class="skel skel-line"></div>
+              }
+            </div>
+          </div>
 
-      <div class="day-detail">
-        <div class="day-section">
-          <h4>Ingredients</h4>
-          <ul>
-            @for (item of day.ingredients; track item) {
-              <li>{{ item }}</li>
-            }
-          </ul>
+          <div class="day-section">
+            <div class="skel skel-block-label"></div>
+            <div class="skel-list">
+              @for (i of [1,2,3]; track i) {
+                <div class="skel skel-line"></div>
+              }
+            </div>
+          </div>
         </div>
+      } @else {
+        @if (hasImage(day)) {
+          <img class="day-hero-img" [src]="day.imageUrl" alt="" referrerpolicy="no-referrer" (error)="onImageError(day.imageUrl)" />
+        }
 
-        <div class="day-section">
-          <h4>Steps</h4>
-          <ol class="steps-list">
-            @for (step of day.steps; track step) {
-              <li>{{ step }}</li>
-            }
-          </ol>
+        <div class="recipe-name">{{ day.recipeName }}</div>
+
+        <div class="day-detail">
+          <div class="day-section">
+            <h4>Ingredients</h4>
+            <ul>
+              @for (item of day.ingredients; track item) {
+                <li>{{ item }}</li>
+              }
+            </ul>
+          </div>
+
+          <div class="day-section">
+            <h4>Steps</h4>
+            <ol class="steps-list">
+              @for (step of day.steps; track step) {
+                <li>{{ step }}</li>
+              }
+            </ol>
+          </div>
         </div>
-      </div>
+      }
 
     } @else {
 
@@ -58,6 +91,10 @@
       </div>
 
       @if (loading) {
+        @if (loadingStatus) {
+          <div class="loading-status">{{ loadingStatus }}</div>
+        }
+
         <div class="params-row">
           @for (i of [1,2,3]; track i) {
             <div class="skel skel-bubble"></div>
@@ -82,30 +119,34 @@
 
         @if (parameterBubbles.length > 0 || seasonalProduce.length > 0) {
           <div class="params-row">
-            @for (bubble of parameterBubbles; track bubble) {
-              <span class="param-chip">{{ bubble }}</span>
+            @for (bubble of parameterBubbles; track bubble.label) {
+              <span class="param-chip" [class]="'chip-' + bubble.type">{{ bubble.label }}</span>
             }
 
             @if (seasonalProduce.length > 0) {
-              <span class="param-chip clickable" #produceChip (click)="$event.stopPropagation(); openProduceMenu(produceChip)">
+              <span class="param-chip clickable chip-produce" #produceChip (click)="$event.stopPropagation(); openProduceMenu(produceChip)">
                 Seasonal produce
               </span>
             }
           </div>
         }
 
-        @for (block of blocks; track block.label) {
+        @for (block of displayBlocks(); track block.label) {
           <div class="block">
             <div class="block-label">{{ block.label }}</div>
             <div class="days-row">
-              @for (day of block.days; track day.date) {
-                <div class="day-card" (click)="$event.stopPropagation(); expandDay(day)">
-                  <div class="day-card-header">
+              @for (slot of block.slots; track slot.date) {
+                @if (slot.day; as day) {
+                  <div class="day-card" [class.weekend]="slot.weekend" [style.grid-column]="slot.column" (click)="$event.stopPropagation(); expandDay(day)">
                     <div class="day-date">{{ day.date }}</div>
-                    <span class="day-toggle">▸</span>
+                    <div class="day-title">{{ day.recipeName }}</div>
                   </div>
-                  <div class="day-title">{{ day.recipeName }}</div>
-                </div>
+                } @else {
+                  <div class="day-card placeholder" [class.weekend]="slot.weekend" [style.grid-column]="slot.column">
+                    <div class="day-date">{{ slot.date }}</div>
+                    <div class="day-title">—</div>
+                  </div>
+                }
               }
             </div>
           </div>
@@ -125,7 +166,10 @@
        [style.top.px]="produceDropdownY()"
        (click)="$event.stopPropagation()">
     @for (item of seasonalProduce; track item) {
-      <div class="produce-dropdown-item">{{ item }}</div>
+      <div class="produce-dropdown-item">
+        <span class="produce-dot"></span>
+        {{ item }}
+      </div>
     }
   </div>
 }

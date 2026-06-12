@@ -29,6 +29,9 @@
 
     @if (loading) {
       <div class="loading-skeleton">
+        @if (loadingStatus) {
+          <div class="loading-status">{{ loadingStatus }}</div>
+        }
         <div class="skel skel-title"></div>
         <div class="recipe-grid">
           <div class="recipe-section">
@@ -51,6 +54,10 @@
         </div>
       </div>
     } @else if (data) {
+      @if (hasImage(data)) {
+        <img class="recipe-hero-img" [src]="data.imageUrl" alt="" referrerpolicy="no-referrer" (error)="onImageError(data.imageUrl)" />
+      }
+
       <div class="recipe-name">{{ data.recipeName }}</div>
       <div class="recipe-grid">
         <div class="recipe-section">

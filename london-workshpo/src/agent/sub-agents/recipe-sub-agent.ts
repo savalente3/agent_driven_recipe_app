@@ -3,6 +3,7 @@ import { tool } from "@langchain/core/tools";
 import * as z from "zod";
 import { subAgentModel } from "../config.js";
 import { searchRecipes } from "../tools/search-recipes.js";
+import { imageValidationMiddleware } from "../middleware/image-validation.js";
 
 const systemPrompt = `You are a talented, instinctive chef. You cook from the heart — whatever feels right, right now. Someone opens their fridge and tells you what they've got, and you immediately know what to make.
 You let the weather outside inspire the mood of the dish — not just the temperature, but the feeling. A grey rainy afternoon calls for something comforting and indulgent. A bright sunny day calls for something fresh and vibrant.
@@ -12,21 +13,24 @@ Make it delicious. Make it exciting. Make it something worth cooking tonight.
 You will receive ingredients, the current weather, and what's in season locally.
 
 Steps:
-1. Call search_recipes with a descriptive query that combines the ingredients, weather mood, and seasonal produce — e.g. "hearty mushroom risotto for a rainy day using seasonal autumn courgettes".
+1. Call search_recipes with a descriptive query that combines the ingredients, weather mood, and seasonal produce — e.g. "hearty mushroom risotto for a rainy day using seasonal autumn courgettes". The search results include an "images" array of real photo URLs with descriptions — keep these in mind for step 4.
 2. Pick the most exciting, fitting recipe from the results — trust your instincts.
-3. Write out the full recipe: name, ingredients with quantities, and step-by-step cooking instructions.`;
+3. Write out the full recipe: name, ingredients with quantities, and step-by-step cooking instructions.
+4. If one of the images from the search results plausibly depicts this dish (matching dish type, main ingredients, or style — based on its description), set imageUrl to that image's url. If nothing fits well, set imageUrl to null.`;
 
 export const recipeSchema = z.object({
   recipeName: z.string().describe("name of the recipe"),
   ingredients: z.array(z.string()).describe("ingredients with quantities, e.g. '1 avocado, diced'"),
   steps: z.array(z.string()).describe("ordered cooking steps written out in full"),
+  imageUrl: z.string().nullable().describe("URL of a real photo from the search results that plausibly depicts this dish, or null if none fits well"),
 });
 
 const recipeAgent = createAgent({
   model: subAgentModel,
   tools: [searchRecipes],
   systemPrompt,
-  responseFormat: recipeSchema
+  responseFormat: recipeSchema,
+  middleware: [imageValidationMiddleware]
 });
 
 type Recipe = z.infer<typeof recipeSchema>;

@@ -5,7 +5,7 @@ import * as z from "zod";
 export const searchRecipes = tool(
   async ({ query }: { query: string }) => {
     const input = z.object({ query: z.string() }).parse({ query });
-    return await new TavilySearch({ maxResults: 5 }).invoke(input);
+    return await new TavilySearch({ maxResults: 5, includeImages: true, includeImageDescriptions: true }).invoke(input);
   },
   {
     name: "search_recipes",

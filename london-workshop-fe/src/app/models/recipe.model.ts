@@ -2,6 +2,7 @@ export interface Recipe {
   recipeName: string;
   ingredients: string[];
   steps: string[];
+  imageUrl?: string | null;
 }
 
 export interface ThreadResponse {
@@ -18,6 +19,7 @@ export interface MealPlanDay {
   recipeName: string;
   ingredients: string[];
   steps: string[];
+  imageUrl?: string | null;
 }
 
 export interface MealPlanBlock {

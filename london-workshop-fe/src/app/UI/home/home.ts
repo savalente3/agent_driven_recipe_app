@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal, ViewChild, ElementRef } from '@angular/core';
 import { AIagentService } from '../../service/agent.service';
-import { Recipe, MealPlan } from '../../models/recipe.model';
+import { Recipe, MealPlan, MealPlanDay } from '../../models/recipe.model';
 import { RecipeComponent } from '../recipe/recipe';
 import { MealPlanComponent } from '../meal-plan/meal-plan';
 import { slideInUp, fadeScale } from './animations';
@@ -29,6 +29,7 @@ export class Home {
   activeView = signal<'initial' | 'recipe' | 'mealplan'>('initial');
   submitted  = signal(false);
   isLoading  = signal(false);
+  regeneratingDayDate = signal<string | null>(null);
 
   reqDateRange = signal('');
   reqPeople    = signal('');
@@ -57,6 +58,8 @@ export class Home {
     const r = this.agentService.result();
     return r?.module === 'meal-plan' ? (r.data as MealPlan) : null;
   });
+
+  loadingStatus = computed(() => this.agentService.loadingStatus());
 
   dropdownOptions = computed(() =>
     KEYWORDS.filter(kw => kw !== this.activeKeyword())
@@ -330,6 +333,21 @@ export class Home {
         if (params.allergies?.length) this.reqDietary.set(params.allergies.join(', '));
       }
 
+    }
+  }
+
+  async onRegenerateDay(day: MealPlanDay) {
+    this.regeneratingDayDate.set(day.date);
+
+    try {
+      const dietary = this.mealPlanData()?.parameters?.allergies ?? [];
+      const recipe = await this.agentService.regenerateMealPlanDay(day, this.location(), dietary);
+
+      if (recipe) {
+        this.agentService.updateMealPlanDay(day.date, recipe);
+      }
+    } finally {
+      this.regeneratingDayDate.set(null);
     }
   }
 }
